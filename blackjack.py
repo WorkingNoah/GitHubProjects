@@ -52,6 +52,7 @@ def score_hand(hand) -> int:
         score += card_value
         if score > 21 and ace:
             score -= 10
+            ace = False
     return score
 
 
