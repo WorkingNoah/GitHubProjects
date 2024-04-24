@@ -1,0 +1,52 @@
+import tkinter
+
+main_window = tkinter.Tk()
+
+main_window.title('MadLibs')
+main_window.geometry('640x480')
+
+input_frame = tkinter.Frame(main_window)
+input_frame.grid(row=0, column=0, sticky='ew')
+
+result_text = tkinter.StringVar()
+tkinter.Label(main_window, textvariable=result_text).grid(row=0, column=1, sticky='ns')
+
+
+def play():
+
+    main_name = tkinter.StringVar()
+    tkinter.Label(input_frame, text=f'Pick a name:').pack(padx=1, pady=1)
+    tkinter.Entry(input_frame, textvariable=main_name).pack(padx=1, pady=1)
+
+    noun = tkinter.StringVar()
+    tkinter.Label(input_frame, text=f'Pick a noun:').pack(padx=1, pady=1)
+    tkinter.Entry(input_frame, textvariable=noun).pack(padx=1, pady=1)
+
+    first_verb = tkinter.StringVar()
+    tkinter.Label(input_frame, text=f'Pick a verb:').pack(padx=1, pady=1)
+    tkinter.Entry(input_frame, textvariable=first_verb).pack(padx=1, pady=1)
+
+    secondary_name = tkinter.StringVar()
+    tkinter.Label(input_frame, text=f'Pick another name:').pack(padx=1, pady=1)
+    tkinter.Entry(input_frame, textvariable=secondary_name).pack(padx=1, pady=1)
+
+    second_verb = tkinter.StringVar()
+    tkinter.Label(input_frame, text=f'Pick another verb:').pack(padx=1, pady=1)
+    tkinter.Entry(input_frame, textvariable=second_verb).pack(padx=1, pady=1)
+
+    def go_game():
+
+        result = (f"{main_name.get()} went to the shops to buy some {noun.get()}s for his secret {noun.get()} collection. On the way back, \n "
+                  f"he decided to {first_verb.get()} (for no apparent reason). Now, he's been hiding this collection from \n "
+                  f"{secondary_name.get()} for a while.\nOH NO!!! {secondary_name.get()} walked in on {main_name.get()} {second_verb.get()}ing his \n "
+                  f"{noun.get()} collection. So anyway in the end {main_name.get()} and {secondary_name.get()} ended up \n {first_verb.get()}ing!")
+        result_text.set(result)
+
+    go_button = tkinter.Button(input_frame, text='Make me a story!', command=go_game)
+    go_button.pack(padx=3, pady=3)
+
+
+if __name__ == '__main__':
+    play()
+    main_window.mainloop()
+
