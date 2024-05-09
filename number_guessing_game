@@ -1,0 +1,81 @@
+from random import randint
+import sqlite3
+
+conn = sqlite3.connect('scores.sqlite')
+conn.execute('CREATE TABLE IF NOT EXISTS scores (name TEXT NOT NULL, games_played INTEGER NOT NULL, average_guesses'
+             ' INTEGER NOT NULL, grand_total INTEGER NOT NULL)')
+
+
+class PlayerScore:
+
+    def __init__(self, player_name):
+        self.player_name = player_name
+
+        selected = conn.execute('SELECT name, games_played, average_guesses, grand_total FROM scores'
+                                ' WHERE name = ?', (name, ))
+        result = selected.fetchone()
+        if result:
+            self.player_name = result[0]
+            self.games_played = result[1]
+            self.average_guesses = result[2]
+            self.grand_total = result[3]
+        else:
+            conn.execute('INSERT INTO scores VALUES (?, 0, 0, 0)', (self.player_name, ))
+            conn.commit()
+            selected = conn.execute('SELECT name, games_played, average_guesses, grand_total FROM scores'
+                                    ' WHERE name = ?', (name, ))
+            result = selected.fetchone()
+            self.player_name = result[0]
+            self.games_played = result[1]
+            self.average_guesses = result[2]
+            self.grand_total = result[3]
+
+    def show_score(self):
+        _, games_played, average_guesses, grand_total = conn.execute('SELECT * FROM scores WHERE name = ?',
+                                                                     (self.player_name, )).fetchone()
+        print(f'\x1b[4mPlayer: {self.player_name}\nNumber of games played: {games_played}\nAverage number of guesses it '
+              f'takes you: {average_guesses}\nTotal number of guesses ever made: {grand_total}')
+
+    def game_complete(self):
+        self.games_played += 1
+        self.average_guesses = self.grand_total // self.games_played
+        conn.execute('UPDATE scores SET games_played = ? WHERE name = ?',
+                     (self.games_played, self.player_name))
+        conn.execute('UPDATE scores SET average_guesses = ? WHERE name = ?',
+                     (self.average_guesses, self.player_name))
+        conn.commit()
+
+    def guess_made(self):
+        self.grand_total += 1
+        conn.execute('UPDATE scores SET grand_total = ? WHERE name = ?',
+                     (self.grand_total, self.player_name))
+        conn.commit()
+
+
+def game():
+    guess_num = randint(1, 1000)
+    response = int(input('Guess a number between 1 and 1000: '))
+    while response != guess_num:
+        player.guess_made()
+        if response < guess_num:
+            response = int(input('Guess higher: '))
+        else:
+            response = int(input('Guess lower: '))
+
+    player.game_complete()
+    print(f'\x1b[34mCorrect! {guess_num} was the right number!\x1b[0m')
+
+
+if __name__ == '__main__':
+    
+    name = input('Please enter your name: ')
+    player = PlayerScore(name)
+
+    while True:
+        player.show_score()
+        go = input('\x1b[0mEnter to go. Anything else to quit.')
+        if go == '':
+            game()
+        else:
+            conn.close()
+            break
